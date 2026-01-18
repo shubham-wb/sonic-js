@@ -18,7 +18,7 @@ export default class Game extends Phaser.Scene {
         const maxSpeed = 0.7;
 
         this.score = 0;
-        this.speed = 0.1;
+        this.speed = 0.2;
 
         this.background = this.add.tileSprite(0, -100, 0, 0, "chemical-bg")
 
@@ -159,8 +159,8 @@ export default class Game extends Phaser.Scene {
             if (this.speed > maxSpeed) {
                 return
             }
-            this.speed += 0.02
-            this.time.delayedCall(Phaser.Math.Between(1000, 2000), () => {
+            this.speed += 0.01
+            this.time.delayedCall(Phaser.Math.Between(2000, 4000), () => {
                 increaseGameSpeed()
             })
         }
