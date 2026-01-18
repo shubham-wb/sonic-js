@@ -1,5 +1,12 @@
 # Sonic JS
 
+**Hosted Link**
+https://mellow-squirrel-92984c.netlify.app/
+
+**Video Showcase:**
+
+https://youtu.be/NsLS13ksON8
+
 A Sonic-inspired endless runner game built with Phaser 4 and Vite.
 
 ## 🎮 Game Description
@@ -101,3 +108,4 @@ Built using Sonic the Hedgehog assets and inspired by the classic Sonic games.
 ## 📄 License
 
 This is a fan project for educational purposes.
+
