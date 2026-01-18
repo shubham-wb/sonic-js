@@ -1,5 +1,7 @@
 import Motobug from "../entities/Motobug";
 import Sonic from "../entities/Sonic";
+import Ring from "../entities/Ring";
+import { selectSpawner } from "../utils";
 export default class Game extends Phaser.Scene {
     constructor() {
         super({ key: "game" })
@@ -18,6 +20,13 @@ export default class Game extends Phaser.Scene {
         this.platforms = this.add.tileSprite(0, -950, 0, 0, "platforms")
         this.platforms.setScale(4)
         this.platforms.setOrigin(0);
+
+
+        this.scoreText = this.add.text(20, 20, `SCORE: ${this.score}`, {
+            fontFamily: "mania",
+            resolution: 4,
+            fontSize: 64
+        })
 
 
         const groundGroup = this.physics.add.staticGroup();
@@ -42,14 +51,31 @@ export default class Game extends Phaser.Scene {
         this.input.on("pointerdown", jumpLogic)
 
         this.motobugs = this.add.group()
+        this.rings = this.add.group()
+
 
         const spawnMotobugs = () => {
             this.motobugs.add(new Motobug(this, new Phaser.Math.Vector2(1950, 780)))
         }
 
 
+
+        const spawnRings = () => {
+            this.rings.add(new Ring(this, new Phaser.Math.Vector2(1950, 780)))
+        }
+
+
+
         const spawnObstaclesPeriodically = () => {
-            spawnMotobugs()
+            const spawners = [spawnMotobugs, spawnRings]
+            const spawnerWeights = [0.6, 0.4]
+
+
+            const chosenSpawner = selectSpawner(spawners, spawnerWeights)
+
+
+            chosenSpawner()
+
             this.time.delayedCall(Phaser.Math.Between(500, 1500), () => {
                 spawnObstaclesPeriodically()
             })
@@ -57,6 +83,9 @@ export default class Game extends Phaser.Scene {
         }
 
         this.physics.add.collider(this.sonic, this.motobugs, (player, motobug) => {
+
+        })
+        this.physics.add.collider(this.sonic, this.rings, (player, ring) => {
 
         })
         spawnObstaclesPeriodically()
@@ -68,7 +97,11 @@ export default class Game extends Phaser.Scene {
 
 
         for (const motobug of this.motobugs.children) {
-            motobug.x -= this.speed * delta;
+            motobug.x -= 6 * this.speed * delta;
+        }
+
+        for (const ring of this.rings.children) {
+            ring.x -= 4 * this.speed * delta;
         }
     }
 }

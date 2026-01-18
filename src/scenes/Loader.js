@@ -3,6 +3,16 @@ export default class Loader extends Phaser.Scene {
         super({ key: "loader" })
     }
 
+    async loadFont(name, url) {
+        const newFont = new FontFace(name, `url(${url})`);
+        const loadedFont = await newFont.load()
+        if (loadedFont) {
+            document.fonts.add(loadedFont);
+            return
+        }
+        throw new Error('Font failed to load');
+    }
+
     preload() {
         this.load.spritesheet("sonic", "./graphics/sonic.png", {
             frameWidth: 32,
@@ -27,7 +37,12 @@ export default class Loader extends Phaser.Scene {
         this.load.audio("city", "./sounds/city.mp3")
     }
 
-    create() {
+    async create() {
+        this.textures.get("sonic").setFilter(Phaser.Textures.FilterMode.NEAREST)
+        this.textures.get("motobug").setFilter(Phaser.Textures.FilterMode.NEAREST)
+        this.textures.get("ring").setFilter(Phaser.Textures.FilterMode.NEAREST)
+        this.textures.get("platforms").setFilter(Phaser.Textures.FilterMode.NEAREST)
+        this.textures.get("chemical-bg").setFilter(Phaser.Textures.FilterMode.NEAREST)
         this.anims.create({
             key: "run",
             frames: this.anims.generateFrameNumbers("sonic", {
@@ -61,7 +76,7 @@ export default class Loader extends Phaser.Scene {
             })
         })
 
-
+        await this.loadFont("mania", "fonts/mania.ttf")
         this.scene.start("game")
 
     }
