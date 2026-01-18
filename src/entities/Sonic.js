@@ -13,10 +13,20 @@ export default class Sonic extends Phaser.GameObjects.Sprite {
 
 
         this.play({ key: "run", repeat: -1 })
+        this.jumpSound = this.scene.sound.add("jump", { volume: 0.5 })
     }
 
-    jump() {
+    jump(forceAJump) {
+
+        if (!this.body.blocked.down && !forceAJump) {
+            return
+        }
+
+
         if ("setVelocityY" in this.body) {
+            if (!this.jumpSound.isPlaying) {
+                this.jumpSound.play();
+            }
             this.body.setVelocityY(this.jumpVelocity)
             this.scene.time.delayedCall(100, () => {
                 this.play({ key: "jump", repeat: -1 })

@@ -1,6 +1,7 @@
 import Phaser from "phaser"
 import Loader from "./scenes/Loader"
 import Game from "./scenes/Game"
+import GameOver from "./scenes/GameOver"
 const config = {
   width: 1920,
   height: 1080,
@@ -10,7 +11,7 @@ const config = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   parent: "game",
-  scene: [Loader, Game],
+  scene: [Loader, Game, GameOver],
   physics: {
     default: "arcade",
     arcade: {

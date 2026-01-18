@@ -9,10 +9,17 @@ export default class Game extends Phaser.Scene {
     }
 
     create() {
+
+        this.cityAmbience = this.sound.add("city", { volume: 0.2, loop: true });
+        this.cityAmbience.play();
+
         const centerPos = { x: this.scale.width / 2, y: this.scale.height / 2 }
+        let comboMultiplier = 0;
+        const maxSpeed = 0.7;
+
         this.score = 0;
         this.speed = 0.1;
-        this.comboMultiplier = 0;
+
         this.background = this.add.tileSprite(0, -100, 0, 0, "chemical-bg")
 
         this.background.setScale(2);
@@ -31,7 +38,7 @@ export default class Game extends Phaser.Scene {
 
         this.multiplierText = this.add.text(0, 0, "", {
             ...maniaTextConfig,
-            fontSize: 8,
+            fontSize: 48,
             color: "#ffff00"
         })
 
@@ -52,9 +59,11 @@ export default class Game extends Phaser.Scene {
 
 
         this.sonic = new Sonic(this, 200, 750)
+
         this.physics.add.collider(this.sonic, this.ground, () => {
             if (this.sonic.body.blocked.down && this.sonic.anims.currentAnim.key !== "run") {
                 this.sonic.play({ key: "run", repeat: -1 })
+                comboMultiplier = 0;
             }
         })
 
@@ -102,10 +111,19 @@ export default class Game extends Phaser.Scene {
         }
 
         this.physics.add.collider(this.sonic, this.motobugs, (player, motobug) => {
+
             if (this.sonic.body.blocked.down) {
-                //game over 
+                this.sound.play("hurt", { volume: 0.5 });
+                this.cityAmbience.stop();
+                this.registry.set("score", this.score)
+                this.scene.start("gameover")
                 return
             }
+            this.sound.play("destroy", { volume: 0.5 });
+
+
+            this.sound.play("hyper-ring", { volume: 0.5 });
+
             motobug.destroy();
 
             const baseScore = 10;
@@ -118,7 +136,7 @@ export default class Game extends Phaser.Scene {
             }
             this.score += baseScore * comboMultiplier
             this.scoreText.setText(`SCORE: ${this.score}`)
-
+            this.sonic.jump(true)
             this.time.delayedCall(700, () => {
                 this.multiplierText.setText("")
             })
@@ -126,16 +144,27 @@ export default class Game extends Phaser.Scene {
         })
 
         this.physics.add.collider(this.sonic, this.rings, (player, ring) => {
-
+            this.sound.play("ring", { volume: 0.5 });
             ring.destroy();
             this.score += 1
             this.scoreText.setText(`SCORE: ${this.score}`)
-
-
-
         })
 
-        spawnObstaclesPeriodically()
+
+        this.time.delayedCall(1000, () => {
+            spawnObstaclesPeriodically()
+        })
+
+        const increaseGameSpeed = () => {
+            if (this.speed > maxSpeed) {
+                return
+            }
+            this.speed += 0.02
+            this.time.delayedCall(Phaser.Math.Between(1000, 2000), () => {
+                increaseGameSpeed()
+            })
+        }
+        increaseGameSpeed()
     }
 
     update(_, delta) {
@@ -148,10 +177,22 @@ export default class Game extends Phaser.Scene {
 
 
         for (const motobug of this.motobugs.children) {
-            motobug.x -= 6 * this.speed * delta;
+
+            if (motobug.x < 0) {
+                motobug.destroy()
+                continue;
+            }
+            const speedBoost = this.speed
+                < 0.4 ? 6 : 5;
+
+            motobug.x -= speedBoost * this.speed * delta;
         }
 
         for (const ring of this.rings.children) {
+            if (ring.x < 0) {
+                ring.destroy()
+                continue;
+            }
             ring.x -= 4 * this.speed * delta;
         }
     }

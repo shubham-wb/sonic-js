@@ -51,6 +51,7 @@ export default class Loader extends Phaser.Scene {
         this.load.audio("hyper-ring", "./sounds/HyperRing.wav")
         this.load.audio("music", "./sounds/Hurt.wav")
         this.load.audio("city", "./sounds/city.mp3")
+        this.load.audio("hurt", "./sounds/Hurt.wav")
     }
 
     async create() {
