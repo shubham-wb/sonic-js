@@ -41,7 +41,6 @@ export default class Loader extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers("motobug", {
                 start: 0,
                 end: 4
-                ,
             }),
             frameRate: 8
         })
@@ -53,6 +52,16 @@ export default class Loader extends Phaser.Scene {
             }),
             frameRate: 20
         })
+
+        this.anims.create({
+            key: "jump",
+            frames: this.anims.generateFrameNumbers("sonic", {
+                start: 8,
+                end: 15
+            })
+        })
+
+
         this.scene.start("game")
 
     }

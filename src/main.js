@@ -4,7 +4,7 @@ import Game from "./scenes/Game"
 const config = {
   width: 1920,
   height: 1080,
-  backgroundColor: "#4169e1",
+  backgroundColor: "#000000",
   pixelArt: true,
   scale: {
     mode: Phaser.Scale.FIT,
@@ -18,7 +18,7 @@ const config = {
       gravity: {
         y: 4000
       },
-      debug: true
+      debug: false
     }
   }
 }
