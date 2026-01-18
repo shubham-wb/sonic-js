@@ -10,6 +10,8 @@ export default class Sonic extends Phaser.GameObjects.Sprite {
         this.body.setOffset(5, 18)
         this.jumpVelocity = -2100;
 
+
+
         this.play({ key: "run", repeat: -1 })
     }
 

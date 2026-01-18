@@ -14,6 +14,22 @@ export default class Loader extends Phaser.Scene {
     }
 
     preload() {
+
+        const screenWidth = this.scale.width
+        const screenHeight = this.scale.height
+        const progressBar = this.add.graphics()
+
+        this.load.on("progress", (value) => {
+            progressBar.clear()
+
+            //hex form for color is needed
+            progressBar.fillStyle(0xffffff, 1)
+            progressBar.fillRect(0, screenHeight - 30, screenWidth * value, 30)
+        })
+
+        this.load.on("complete", () => progressBar.destroy())
+
+
         this.load.spritesheet("sonic", "./graphics/sonic.png", {
             frameWidth: 32,
             frameHeight: 44

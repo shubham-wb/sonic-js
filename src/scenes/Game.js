@@ -2,6 +2,7 @@ import Motobug from "../entities/Motobug";
 import Sonic from "../entities/Sonic";
 import Ring from "../entities/Ring";
 import { selectSpawner } from "../utils";
+import { maniaTextConfig } from "../constants";
 export default class Game extends Phaser.Scene {
     constructor() {
         super({ key: "game" })
@@ -11,8 +12,9 @@ export default class Game extends Phaser.Scene {
         const centerPos = { x: this.scale.width / 2, y: this.scale.height / 2 }
         this.score = 0;
         this.speed = 0.1;
-
+        this.comboMultiplier = 0;
         this.background = this.add.tileSprite(0, -100, 0, 0, "chemical-bg")
+
         this.background.setScale(2);
         this.background.setOrigin(0);
         this.background.setAlpha(0.8)
@@ -23,10 +25,24 @@ export default class Game extends Phaser.Scene {
 
 
         this.scoreText = this.add.text(20, 20, `SCORE: ${this.score}`, {
-            fontFamily: "mania",
-            resolution: 4,
+            ...maniaTextConfig,
             fontSize: 64
         })
+
+        this.multiplierText = this.add.text(0, 0, "", {
+            ...maniaTextConfig,
+            fontSize: 8,
+            color: "#ffff00"
+        })
+
+
+        this.howToPlayText = this.add.text(centerPos.x, centerPos.y, "PRESS SPACE OR TAP TO JUMP", {
+            ...maniaTextConfig,
+            fontSize: 48
+        })
+
+
+        this.howToPlayText.setOrigin(0.5)
 
 
         const groundGroup = this.physics.add.staticGroup();
@@ -44,6 +60,9 @@ export default class Game extends Phaser.Scene {
 
 
         const jumpLogic = () => {
+            if (this.howToPlayText) {
+                this.howToPlayText.destroy()
+            }
             this.sonic.jump()
         }
 
@@ -83,15 +102,47 @@ export default class Game extends Phaser.Scene {
         }
 
         this.physics.add.collider(this.sonic, this.motobugs, (player, motobug) => {
+            if (this.sonic.body.blocked.down) {
+                //game over 
+                return
+            }
+            motobug.destroy();
+
+            const baseScore = 10;
+            comboMultiplier += 1
+            if (comboMultiplier > 1) {
+                this.multiplierText.setText(`+${baseScore}`)
+
+            } else {
+                this.multiplierText.setText(`x${comboMultiplier}`)
+            }
+            this.score += baseScore * comboMultiplier
+            this.scoreText.setText(`SCORE: ${this.score}`)
+
+            this.time.delayedCall(700, () => {
+                this.multiplierText.setText("")
+            })
 
         })
+
         this.physics.add.collider(this.sonic, this.rings, (player, ring) => {
 
+            ring.destroy();
+            this.score += 1
+            this.scoreText.setText(`SCORE: ${this.score}`)
+
+
+
         })
+
         spawnObstaclesPeriodically()
     }
 
     update(_, delta) {
+
+        this.multiplierText.setPosition(this.sonic.x + 70, this.sonic.y - 100);
+
+
         this.background.tilePositionX += 0.05 * delta;
         this.platforms.tilePositionX += this.speed * delta;
 
